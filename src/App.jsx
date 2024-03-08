@@ -4,6 +4,7 @@ import Form from './components/Form'
 import { useState } from 'react'
 import { useEffect } from 'react'
 import Result from './components/Result'
+import Spinner from './components/Spinner'
 
 const Container = styled.div`
   max-width: 900px;
@@ -49,15 +50,19 @@ const Heading = styled.h1`
 const App = () => {
   const [currencies, setCurrencies] = useState({})
   const [result, setResult] = useState({})
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (Object.values(currencies).length > 0) {
       const quote = async () => {
+        setResult({})
+        setLoading(true)
         const { crypto, coin } = currencies
         const url = `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${crypto}&tsyms=${coin}`
         const response = await fetch(url)
         const data = await response.json()
         setResult(data.DISPLAY[crypto][coin])
+        setLoading(false)
       }
       quote()
     }
@@ -69,6 +74,7 @@ const App = () => {
       <div>
         <Heading>Cotizador de Criptomonedas</Heading>
         <Form setCurrencies={setCurrencies} />
+        { loading && <Spinner />}
         { result.PRICE && <Result result={result} /> }
       </div>
     </Container>
